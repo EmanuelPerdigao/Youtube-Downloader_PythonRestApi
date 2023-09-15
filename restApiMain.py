@@ -51,13 +51,18 @@ def download_music():
                     print("Exception:", str(e))  # Print the exception for debugging
                     return jsonify({'error': 'Internal server error'}), 500
 
-        # Submit the download_task to the ThreadPoolExecutor
+       # Submit the download_task to the ThreadPoolExecutor
         future = executor.submit(download_task)
-        return jsonify({'message': 'Download request is being processed in the background'})
+        
+        # Wait for the future to complete and return the result
+        result = future.result()
+        
+        # Return the result of the download_task
+        return result  
 
     except Exception as e:
         print("Exception:", str(e))  # Print the exception for debugging
         return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='localhost', port=5000, debug=True)
