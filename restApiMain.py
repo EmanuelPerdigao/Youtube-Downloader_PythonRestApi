@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Create a ThreadPoolExecutor with a specified number of workers
-executor = ThreadPoolExecutor(max_workers=4)  # You can adjust the number of workers as needed
+executor = ThreadPoolExecutor(max_workers=20)  # You can adjust the number of workers as needed
 
 @app.route('/download', methods=['POST'])
 def download_music():
