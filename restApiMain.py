@@ -25,30 +25,31 @@ def download_music():
 
         # Define a function to handle the download task
         def download_task():
-            try:
-                if output_format == "mp4":
-                    video_stream = yt.streams.get_highest_resolution()
-                    downloaded_file_path = video_stream.download(output_path="./downloads")
-                elif output_format == "mp3":
-                    audio_stream = yt.streams.filter(only_audio=True).first()
-                    downloaded_file_path = audio_stream.download(output_path="./downloads")
-                else:
-                    return jsonify({'error': 'Invalid output_format'}), 400
+            with app.app_context():  # Create an application context
+                try:
+                    if output_format == "mp4":
+                        video_stream = yt.streams.get_highest_resolution()
+                        downloaded_file_path = video_stream.download(output_path="./downloads")
+                    elif output_format == "mp3":
+                        audio_stream = yt.streams.filter(only_audio=True).first()
+                        downloaded_file_path = audio_stream.download(output_path="./downloads")
+                    else:
+                        return jsonify({'error': 'Invalid output_format'}), 400
 
-                if downloaded_file_path:
-                    with open(downloaded_file_path, 'rb') as file:
-                        contentBytes = file.read()
-                    os.remove(downloaded_file_path)
-                    title = yt.title
-                    # Encode the bytes as Base64
-                    contentBytesBase64 = base64.b64encode(contentBytes).decode('utf-8')
-                    return jsonify({'musicName': title, 'musicBytes': contentBytesBase64})
-                else:
-                    return jsonify({'error': 'Download failed'}), 500
+                    if downloaded_file_path:
+                        with open(downloaded_file_path, 'rb') as file:
+                            contentBytes = file.read()
+                        os.remove(downloaded_file_path)
+                        title = yt.title
+                        # Encode the bytes as Base64
+                        contentBytesBase64 = base64.b64encode(contentBytes).decode('utf-8')
+                        return jsonify({'musicName': title, 'musicBytes': contentBytesBase64})
+                    else:
+                        return jsonify({'error': 'Download failed'}), 500
 
-            except Exception as e:
-                print("Exception:", str(e))  # Print the exception for debugging
-                return jsonify({'error': 'Internal server error'}), 500
+                except Exception as e:
+                    print("Exception:", str(e))  # Print the exception for debugging
+                    return jsonify({'error': 'Internal server error'}), 500
 
         # Submit the download_task to the ThreadPoolExecutor
         future = executor.submit(download_task)
